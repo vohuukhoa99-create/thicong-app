@@ -724,6 +724,7 @@ function App() {
   const [loginForm, setLoginForm] = useState({ email: "", matKhau: "" });
   const [loginError, setLoginError] = useState("");
   const [activeMenu, setActiveMenu] = useState(mainMenus[0].key);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedContractId, setSelectedContractId] = useState(ALL_CONTRACTS);
   const [logForm, setLogForm] = useState(defaultLogForm);
   const [constructionLogs, setConstructionLogs] = useState(readSavedLogs);
@@ -1993,6 +1994,12 @@ function App() {
   function handleLogout() {
     localStorage.removeItem(CURRENT_USER_STORAGE_KEY);
     setCurrentUser(null);
+    setIsMobileMenuOpen(false);
+  }
+
+  function handleChangeMenu(menuKey) {
+    setActiveMenu(menuKey);
+    setIsMobileMenuOpen(false);
   }
 
   if (!currentUser) {
@@ -2007,7 +2014,13 @@ function App() {
   }
 
   return (
-    <div className="app-shell">
+    <div className={isMobileMenuOpen ? "app-shell mobile-menu-open" : "app-shell"}>
+      <div
+        className="mobile-drawer-backdrop"
+        onClick={() => setIsMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
+
       <aside className="sidebar">
         <div className="brand">
           <span className="brand-mark">TC</span>
@@ -2015,6 +2028,16 @@ function App() {
             <strong>Quản Lý Thi Công</strong>
             <small>Công ty CP Sơn và Chất phủ Hòa Bình</small>
           </div>
+        </div>
+
+        <button className="drawer-close" type="button" onClick={() => setIsMobileMenuOpen(false)} aria-label="Đóng menu">
+          X
+        </button>
+
+        <div className="drawer-user">
+          <strong>{currentUser.hoTen || currentUser.email}</strong>
+          <span>{formatUserRoles(currentUser.roles)}</span>
+          <button className="secondary" type="button" onClick={handleLogout}>Đăng xuất</button>
         </div>
 
         <nav className="nav-list" aria-label="Menu chính">
@@ -2025,7 +2048,7 @@ function App() {
                 <button
                   key={item.key}
                   className={activeMenu === item.key ? "nav-item active" : "nav-item"}
-                  onClick={() => setActiveMenu(item.key)}
+                  onClick={() => handleChangeMenu(item.key)}
                   type="button"
                 >
                   {item.label}
@@ -2038,9 +2061,21 @@ function App() {
 
       <main className="main-content">
         <header className="topbar">
-          <div>
+          <div className="topbar-title">
+            <button
+              className="mobile-menu-button"
+              type="button"
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Mở menu"
+              aria-expanded={isMobileMenuOpen}
+            >
+              ☰
+            </button>
             <p className="eyebrow">Công ty CP Sơn và Chất phủ Hòa Bình</p>
-            <h1>{activeMenuInfo.label}</h1>
+            <h1>
+              <span className="desktop-page-title">{activeMenuInfo.label}</span>
+              <span className="mobile-app-title">Quản Lý Thi Công</span>
+            </h1>
           </div>
 
           <div className="topbar-actions">

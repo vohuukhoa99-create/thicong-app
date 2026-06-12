@@ -1,8 +1,11 @@
 .app-shell {
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
+  grid-template-columns: 240px minmax(0, 1fr);
+  width: 100%;
+  max-width: 100vw;
   min-height: 100vh;
   background: #eef2f7;
+  overflow-x: hidden;
 }
 
 .sidebar {
@@ -10,20 +13,35 @@
   color: #f8fafc;
   max-height: 100vh;
   overflow-y: auto;
-  padding: 22px 18px;
+  min-width: 0;
+  padding: 18px 14px;
+}
+
+.mobile-drawer-backdrop,
+.drawer-close,
+.drawer-user,
+.mobile-menu-button,
+.mobile-app-title {
+  display: none;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 6px 24px;
+  gap: 10px;
+  min-width: 0;
+  padding: 6px 4px 18px;
+}
+
+.brand div {
+  min-width: 0;
 }
 
 .brand-mark {
   display: grid;
-  width: 44px;
-  height: 44px;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
   place-items: center;
   border-radius: 8px;
   background: #f59e0b;
@@ -34,21 +52,24 @@
 .brand strong,
 .brand small {
   display: block;
+  overflow-wrap: anywhere;
 }
 
 .brand small {
   margin-top: 4px;
   color: #b7c0cf;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .nav-list {
   display: grid;
-  gap: 6px;
+  gap: 5px;
 }
 
 .nav-section-title {
-  margin: 16px 4px 6px;
-  padding-top: 14px;
+  margin: 14px 4px 5px;
+  padding-top: 12px;
   border-top: 1px solid rgba(226, 232, 240, 0.18);
   color: #94a3b8;
   font-size: 12px;
@@ -63,10 +84,11 @@
   background: transparent;
   color: #d6deea;
   cursor: pointer;
-  font-size: 15px;
-  line-height: 1.3;
-  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.25;
+  padding: 10px 12px;
   text-align: left;
+  overflow-wrap: anywhere;
 }
 
 .nav-item:hover,
@@ -77,7 +99,9 @@
 
 .main-content {
   min-width: 0;
-  padding: 28px;
+  max-width: 100%;
+  padding: 24px;
+  overflow-x: hidden;
 }
 
 .login-shell {
@@ -124,36 +148,61 @@
 .topbar {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
   align-items: center;
-  margin-bottom: 22px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.topbar > div:first-child {
+  min-width: min(100%, 280px);
+  flex: 1 1 320px;
+}
+
+.topbar-title {
+  display: block;
 }
 
 .topbar h1 {
   margin: 4px 0 0;
   color: #111827;
-  font-size: 30px;
+  font-size: 28px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .topbar-actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  flex: 1 1 420px;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 
 .user-session {
   display: flex;
   align-items: center;
   gap: 10px;
+  max-width: 100%;
+  min-width: 0;
   border: 1px solid #dbe3ef;
   border-radius: 8px;
   background: #ffffff;
   padding: 8px 10px;
 }
 
+.user-session > div {
+  min-width: 0;
+}
+
 .user-session strong,
 .user-session span {
   display: block;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -180,7 +229,9 @@
 .project-filter {
   display: grid;
   gap: 6px;
-  min-width: 240px;
+  flex: 1 1 220px;
+  min-width: 190px;
+  max-width: 320px;
   color: #475569;
   font-size: 13px;
   font-weight: 700;
@@ -190,18 +241,19 @@
 .field input,
 .field select,
 .field textarea {
+  min-width: 0;
   width: 100%;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   background: #ffffff;
   color: #111827;
   font: inherit;
-  padding: 10px 12px;
+  padding: 9px 11px;
 }
 
 .page-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -220,9 +272,10 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   border-bottom: 1px solid #e2e8f0;
-  padding: 10px 0;
+  min-width: 0;
+  padding: 9px 0;
 }
 
 .dashboard-metric:last-child {
@@ -230,14 +283,22 @@
 }
 
 .dashboard-metric span {
+  min-width: 0;
   color: #64748b;
+  font-size: 14px;
   font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .dashboard-metric strong {
+  flex: 0 1 auto;
+  min-width: 72px;
   color: #0f172a;
-  font-size: 18px;
+  font-size: clamp(18px, 1.3vw, 22px);
+  line-height: 1.2;
   text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .dashboard-lists {
@@ -257,62 +318,62 @@
 }
 
 .materials-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
 .labor-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
 .subcontractors-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
 .equipment-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
 .acceptance-summary {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
 .invoices-summary {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
 .other-costs-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
 .documents-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
 .document-templates-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
 .system-catalog-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
 .reports-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
 .wbs-layout .page-grid {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 16px;
 }
 
@@ -325,22 +386,27 @@
 }
 
 .summary-card {
-  min-height: 120px;
-  padding: 18px;
+  min-width: 0;
+  min-height: 96px;
+  padding: 20px;
 }
 
 .summary-card span {
   display: block;
   color: #64748b;
+  font-size: 14px;
   font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .summary-card strong {
   display: block;
-  margin-top: 14px;
+  margin-top: 10px;
   color: #0f172a;
-  font-size: 28px;
-  line-height: 1.1;
+  font-size: clamp(18px, 1.6vw, 22px);
+  line-height: 1.18;
+  overflow-wrap: anywhere;
 }
 
 .summary-card.blue {
@@ -361,7 +427,8 @@
 
 .panel {
   margin-bottom: 16px;
-  padding: 18px;
+  min-width: 0;
+  padding: 20px;
 }
 
 .span-2 {
@@ -369,20 +436,25 @@
 }
 
 .span-3 {
-  grid-column: span 4;
+  grid-column: 1 / -1;
 }
 
 .panel-heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex-wrap: wrap;
   margin-bottom: 14px;
 }
 
 .panel h2 {
   margin: 0;
   color: #111827;
-  font-size: 20px;
+  font-size: 18px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .progress-list {
@@ -471,13 +543,14 @@
 .workflow-card {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  padding: 18px;
+  padding: 20px;
 }
 
 .workflow-card strong {
   display: block;
   color: #0f172a;
   font-size: 18px;
+  line-height: 1.3;
   margin-bottom: 12px;
 }
 
@@ -518,7 +591,7 @@
   font: inherit;
   font-weight: 700;
   min-height: 42px;
-  padding: 10px 16px;
+  padding: 9px 14px;
 }
 
 .button-like.secondary {
@@ -612,8 +685,8 @@ button:disabled {
 
 .progress-row {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) minmax(180px, 2fr) 52px;
-  gap: 14px;
+  grid-template-columns: minmax(150px, 1fr) minmax(160px, 2fr) 52px;
+  gap: 12px;
   align-items: center;
 }
 
@@ -659,7 +732,7 @@ button:disabled {
 .work-form {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  gap: 16px;
 }
 
 .work-form + .table-wrap {
@@ -707,7 +780,7 @@ button {
   cursor: pointer;
   font: inherit;
   font-weight: 700;
-  padding: 10px 16px;
+  padding: 9px 14px;
 }
 
 button:hover {
@@ -727,6 +800,7 @@ button.secondary {
 
 .table-wrap {
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
 }
 
@@ -738,10 +812,12 @@ table {
 
 th,
 td {
-  padding: 12px 10px;
+  padding: 10px 9px;
   border-bottom: 1px solid #e2e8f0;
   text-align: left;
   vertical-align: top;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 th {
@@ -768,7 +844,8 @@ td {
   font-size: 13px;
   font-weight: 700;
   padding: 4px 10px;
-  white-space: nowrap;
+  line-height: 1.25;
+  white-space: normal;
 }
 
 .status.done {
@@ -791,11 +868,34 @@ td {
   line-height: 1.6;
 }
 
-@media (max-width: 1100px) {
+@media (min-width: 1600px) {
+  .page-grid,
+  .dashboard-groups,
+  .boq-layout .page-grid,
+  .wbs-layout .page-grid,
+  .daily-summary,
+  .materials-summary,
+  .labor-summary,
+  .subcontractors-summary,
+  .equipment-summary,
+  .acceptance-summary,
+  .invoices-summary,
+  .other-costs-summary,
+  .documents-summary,
+  .document-templates-summary,
+  .system-catalog-summary,
+  .reports-summary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1366px) {
   .app-shell {
     grid-template-columns: 220px minmax(0, 1fr);
   }
+}
 
+@media (max-width: 1023px) {
   .page-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -835,47 +935,197 @@ td {
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 1023px) {
+  .app-shell {
+    grid-template-columns: 200px minmax(0, 1fr);
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+
+  .sidebar {
+    padding: 16px 12px;
+  }
+
+  .nav-item {
+    padding: 9px 10px;
+  }
+
+  .topbar-actions {
+    justify-content: flex-start;
+  }
+
+  .project-filter {
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 767px) {
   .app-shell {
     display: block;
   }
 
+  .mobile-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: block;
+    background: rgba(15, 23, 42, 0.42);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .mobile-menu-open .mobile-drawer-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .sidebar {
-    padding: 14px;
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 50;
+    width: min(84vw, 320px);
+    max-height: 100dvh;
+    padding: 16px 14px 18px;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    box-shadow: 16px 0 34px rgba(15, 23, 42, 0.22);
+  }
+
+  .mobile-menu-open .sidebar {
+    transform: translateX(0);
   }
 
   .brand {
-    padding-bottom: 12px;
+    padding: 4px 42px 14px 4px;
+  }
+
+  .drawer-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: inline-grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border-radius: 8px;
+    background: #26344f;
+    color: #ffffff;
+    padding: 0;
+  }
+
+  .drawer-user {
+    display: grid;
+    gap: 6px;
+    margin: 0 0 14px;
+    border-top: 1px solid rgba(226, 232, 240, 0.18);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.18);
+    padding: 12px 4px;
+  }
+
+  .drawer-user strong,
+  .drawer-user span {
+    overflow-wrap: anywhere;
+  }
+
+  .drawer-user strong {
+    color: #ffffff;
+    font-size: 14px;
+  }
+
+  .drawer-user span {
+    color: #b7c0cf;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .drawer-user button {
+    width: 100%;
+    margin-top: 4px;
   }
 
   .nav-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
+    gap: 6px;
   }
 
   .nav-section-title {
-    grid-column: 1 / -1;
     margin-top: 10px;
   }
 
   .nav-item {
-    text-align: center;
+    min-height: 42px;
+    padding: 10px 12px;
+    font-size: 15px;
+    line-height: 1.3;
+    text-align: left;
   }
 
   .main-content {
-    padding: 16px;
+    padding: 12px;
   }
 
   .topbar {
     display: grid;
+    gap: 12px;
+    margin-bottom: 14px;
   }
 
-  .topbar-actions,
-  .user-session {
+  .topbar-title {
     display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mobile-menu-button {
+    display: inline-grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    background: #172033;
+    color: #ffffff;
+    font-size: 20px;
+    line-height: 1;
+    padding: 0;
+  }
+
+  .topbar .eyebrow,
+  .desktop-page-title,
+  .topbar .user-session {
+    display: none;
+  }
+
+  .mobile-app-title {
+    display: inline;
+  }
+
+  .topbar h1 {
+    margin: 0;
+    font-size: 22px;
+    line-height: 1.2;
+  }
+
+  .topbar-actions {
+    display: grid;
+    justify-content: stretch;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
   }
 
   .project-filter {
     min-width: 0;
+    max-width: none;
+  }
+
+  .project-filter select,
+  .field input,
+  .field select,
+  .field textarea {
+    min-height: 42px;
   }
 
   .page-grid,
@@ -886,6 +1136,7 @@ td {
 
   .boq-layout .page-grid,
   .wbs-layout .page-grid,
+  .daily-summary,
   .materials-summary,
   .labor-summary,
   .subcontractors-summary,
@@ -905,12 +1156,58 @@ td {
     grid-column: span 1;
   }
 
+  .panel {
+    margin-bottom: 12px;
+    padding: 14px;
+  }
+
+  .summary-card {
+    min-height: auto;
+    padding: 14px;
+  }
+
+  .summary-card strong,
+  .dashboard-metric strong {
+    font-size: 20px;
+  }
+
+  .summary-card span,
+  .dashboard-metric span {
+    font-size: 13px;
+  }
+
+  .dashboard-metric {
+    display: grid;
+    gap: 6px;
+    padding: 8px 0;
+  }
+
+  .dashboard-metric strong {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .panel h2 {
+    font-size: 18px;
+  }
+
   .progress-row {
     grid-template-columns: 1fr;
   }
 
   .form-actions {
     display: grid;
+    gap: 10px;
+  }
+
+  .form-actions button,
+  .excel-actions button,
+  .excel-actions .button-like,
+  .backup-actions button,
+  .backup-actions .button-like {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
   }
 
   .excel-actions {
@@ -920,5 +1217,15 @@ td {
 
   .backup-actions {
     display: grid;
+  }
+
+  .table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 760px;
   }
 }
