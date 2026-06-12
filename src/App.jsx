@@ -937,12 +937,6 @@ function App() {
   const activeMenuKey = canViewMenu(activeMenu) ? activeMenu : getPreferredMenuKey();
   const canAccessActiveMenu = canViewMenu(activeMenuKey);
   const activeMenuInfo = mainMenus.find((item) => item.key === activeMenuKey) ?? mainMenus[0];
-  const visibleSidebarGroups = sidebarGroups
-    .map((group) => ({
-      ...group,
-      items: group.items.filter((item) => item && canViewMenu(item.key)),
-    }))
-    .filter((group) => group.items.length > 0);
   const contractFilterOptions = useMemo(() => getContractFilterOptions(contracts), [contracts]);
   const selectedContractOption = contractFilterOptions.find((option) => option.id === selectedContractId);
   const selectedContractName = selectedContractOption?.name || "";
@@ -2177,10 +2171,16 @@ function App() {
         </div>
 
         <nav className="nav-list" aria-label="Menu chính">
-          {visibleSidebarGroups.map((group) => (
+          {sidebarGroups
+            .map((group) => ({
+              ...group,
+              items: group.items.filter((item) => item && canViewMenu(item.key)),
+            }))
+            .filter((group) => group.items.length > 0)
+            .map((group) => (
             <Fragment key={group.key}>
               {group.title && <div className="nav-section-title">{group.title}</div>}
-              {group.items.filter(Boolean).map((item) => (
+              {group.items.map((item) => (
                 <button
                   key={item.key}
                   className={activeMenuKey === item.key ? "nav-item active" : "nav-item"}
