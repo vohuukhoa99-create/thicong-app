@@ -465,6 +465,133 @@ const mainMenus = [
   { key: "system-settings", label: "⚙️ Cài đặt hệ thống" },
 ];
 
+const MENU_KEY_ALIASES = {
+  "daily-log": "dailyLogs",
+  "other-costs": "otherCosts",
+  documents: "projectDocuments",
+  "document-templates": "documentTemplates",
+  "system-catalog": "masterData",
+  "system-settings": "settings",
+  dailyLogs: "dailyLogs",
+  otherCosts: "otherCosts",
+  projectDocuments: "projectDocuments",
+  documentTemplates: "documentTemplates",
+  masterData: "masterData",
+  settings: "settings",
+};
+
+const ROLE_MENU_PERMISSIONS = {
+  ADMIN: ["*"],
+  TGD: [
+    "dashboard",
+    "contracts",
+    "boq",
+    "wbs",
+    "dailyLogs",
+    "materials",
+    "labor",
+    "subcontractors",
+    "equipment",
+    "acceptance",
+    "invoices",
+    "otherCosts",
+    "reports",
+    "projectDocuments",
+    "documentTemplates",
+  ],
+  GDTC: [
+    "dashboard",
+    "contracts",
+    "boq",
+    "wbs",
+    "dailyLogs",
+    "materials",
+    "labor",
+    "subcontractors",
+    "equipment",
+    "acceptance",
+    "invoices",
+    "otherCosts",
+    "reports",
+    "projectDocuments",
+    "documentTemplates",
+  ],
+  PM: [
+    "dashboard",
+    "contracts",
+    "boq",
+    "wbs",
+    "dailyLogs",
+    "materials",
+    "labor",
+    "subcontractors",
+    "equipment",
+    "acceptance",
+    "invoices",
+    "otherCosts",
+    "reports",
+    "projectDocuments",
+    "documentTemplates",
+  ],
+  CHT: [
+    "dashboard",
+    "wbs",
+    "dailyLogs",
+    "materials",
+    "labor",
+    "subcontractors",
+    "equipment",
+    "acceptance",
+    "projectDocuments",
+    "documentTemplates",
+  ],
+  QS: [
+    "dashboard",
+    "contracts",
+    "boq",
+    "wbs",
+    "dailyLogs",
+    "acceptance",
+    "reports",
+    "projectDocuments",
+    "documentTemplates",
+  ],
+  QC: [
+    "dashboard",
+    "dailyLogs",
+    "acceptance",
+    "projectDocuments",
+    "documentTemplates",
+  ],
+  TKDA: [
+    "dashboard",
+    "contracts",
+    "wbs",
+    "dailyLogs",
+    "acceptance",
+    "invoices",
+    "reports",
+    "projectDocuments",
+    "documentTemplates",
+  ],
+  KTCT: [
+    "dashboard",
+    "contracts",
+    "acceptance",
+    "invoices",
+    "otherCosts",
+    "reports",
+    "projectDocuments",
+  ],
+  KHOCT: [
+    "dashboard",
+    "dailyLogs",
+    "materials",
+    "projectDocuments",
+    "documentTemplates",
+  ],
+};
+
 const sidebarGroups = [
   {
     key: "business",
@@ -807,7 +934,15 @@ function App() {
   const [isSystemSettingsFormOpen, setIsSystemSettingsFormOpen] = useState(false);
   const [excelImportErrors, setExcelImportErrors] = useState([]);
 
-  const activeMenuInfo = mainMenus.find((item) => item.key === activeMenu) ?? mainMenus[0];
+  const activeMenuKey = canViewMenu(activeMenu) ? activeMenu : getPreferredMenuKey();
+  const canAccessActiveMenu = canViewMenu(activeMenuKey);
+  const activeMenuInfo = mainMenus.find((item) => item.key === activeMenuKey) ?? mainMenus[0];
+  const visibleSidebarGroups = sidebarGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => item && canViewMenu(item.key)),
+    }))
+    .filter((group) => group.items.length > 0);
   const contractFilterOptions = useMemo(() => getContractFilterOptions(contracts), [contracts]);
   const selectedContractOption = contractFilterOptions.find((option) => option.id === selectedContractId);
   const selectedContractName = selectedContractOption?.name || "";
@@ -1987,6 +2122,7 @@ function App() {
     const sessionUser = stripSensitiveUser(matchedUser);
     localStorage.setItem(CURRENT_USER_STORAGE_KEY, JSON.stringify(sessionUser));
     setCurrentUser(sessionUser);
+    setActiveMenu(getPreferredMenuKey(sessionUser, activeMenu));
     setLoginForm({ email: "", matKhau: "" });
     setLoginError("");
   }
@@ -2041,13 +2177,13 @@ function App() {
         </div>
 
         <nav className="nav-list" aria-label="Menu chính">
-          {sidebarGroups.map((group) => (
+          {visibleSidebarGroups.map((group) => (
             <Fragment key={group.key}>
               {group.title && <div className="nav-section-title">{group.title}</div>}
               {group.items.filter(Boolean).map((item) => (
                 <button
                   key={item.key}
-                  className={activeMenu === item.key ? "nav-item active" : "nav-item"}
+                  className={activeMenuKey === item.key ? "nav-item active" : "nav-item"}
                   onClick={() => handleChangeMenu(item.key)}
                   type="button"
                 >
@@ -2101,7 +2237,13 @@ function App() {
 
         <ImportErrorPanel errors={excelImportErrors} onClear={() => setExcelImportErrors([])} />
 
-        {activeMenu === "dashboard" && (
+        {!canAccessActiveMenu && (
+          <Panel title="Không có quyền">
+            <p className="placeholder-text">Bạn không có quyền truy cập chức năng này.</p>
+          </Panel>
+        )}
+
+        {canAccessActiveMenu && activeMenuKey === "dashboard" && (
           <Dashboard
             acceptances={filteredAcceptances}
             acceptanceBatches={acceptanceBatches}
@@ -2120,7 +2262,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "contracts" && (
+        {canAccessActiveMenu && activeMenuKey === "contracts" && (
           <ContractsPage
             contracts={contracts}
             form={contractForm}
@@ -2134,7 +2276,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "boq" && (
+        {canAccessActiveMenu && activeMenuKey === "boq" && (
           <BoqPage
             contracts={contracts}
             form={boqForm}
@@ -2149,7 +2291,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "wbs" && (
+        {canAccessActiveMenu && activeMenuKey === "wbs" && (
           <WbsPlanPage
             boqItems={boqItems}
             contracts={contracts}
@@ -2165,7 +2307,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "daily-log" && (
+        {canAccessActiveMenu && activeMenuKey === "daily-log" && (
           <DailyLogPage
             allLogs={constructionLogs}
             contracts={contracts}
@@ -2188,7 +2330,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "materials" && (
+        {canAccessActiveMenu && activeMenuKey === "materials" && (
           <MaterialsPage
             contracts={contracts}
             dailyLogs={constructionLogs}
@@ -2204,7 +2346,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "labor" && (
+        {canAccessActiveMenu && activeMenuKey === "labor" && (
           <LaborPage
             dailyLogs={constructionLogs}
             form={laborTeamForm}
@@ -2219,7 +2361,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "subcontractors" && (
+        {canAccessActiveMenu && activeMenuKey === "subcontractors" && (
           <SubcontractorsPage
             contracts={contracts}
             dailyLogs={constructionLogs}
@@ -2241,7 +2383,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "equipment" && (
+        {canAccessActiveMenu && activeMenuKey === "equipment" && (
           <EquipmentPage
             contracts={contracts}
             dailyLogs={constructionLogs}
@@ -2264,7 +2406,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "acceptance" && (
+        {canAccessActiveMenu && activeMenuKey === "acceptance" && (
           <AcceptancePage
             acceptanceBatchForm={acceptanceBatchForm}
             acceptanceBatches={acceptanceBatches}
@@ -2288,7 +2430,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "invoices" && (
+        {canAccessActiveMenu && activeMenuKey === "invoices" && (
           <InvoicesPage
             acceptanceBatches={acceptanceBatches}
             acceptances={acceptances}
@@ -2310,7 +2452,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "other-costs" && (
+        {canAccessActiveMenu && activeMenuKey === "other-costs" && (
           <OtherCostsPage
             contracts={contracts}
             form={otherCostForm}
@@ -2323,7 +2465,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "reports" && (
+        {canAccessActiveMenu && activeMenuKey === "reports" && (
           <ReportsPage
             acceptances={acceptances}
             acceptanceBatches={acceptanceBatches}
@@ -2344,7 +2486,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "documents" && (
+        {canAccessActiveMenu && activeMenuKey === "documents" && (
           <ProjectDocumentsPage
             activeTab={activeDocumentTab}
             contracts={contracts}
@@ -2362,7 +2504,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "document-templates" && (
+        {canAccessActiveMenu && activeMenuKey === "document-templates" && (
           <DocumentTemplatesPage
             editingTemplateId={editingDocumentTemplateId}
             filters={documentTemplateFilters}
@@ -2382,7 +2524,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "system-catalog" && (
+        {canAccessActiveMenu && activeMenuKey === "system-catalog" && (
           <SystemCatalogPage
             activeTab={activeSystemCatalogTab}
             catalogs={systemCatalogs}
@@ -2401,7 +2543,7 @@ function App() {
           />
         )}
 
-        {activeMenu === "system-settings" && (
+        {canAccessActiveMenu && activeMenuKey === "system-settings" && (
           <SystemSettingsPage
             activeTab={activeSystemSettingsTab}
             catalogs={systemCatalogs}
@@ -2425,23 +2567,24 @@ function App() {
           />
         )}
 
-        {activeMenu !== "dashboard" &&
-          activeMenu !== "contracts" &&
-          activeMenu !== "boq" &&
-          activeMenu !== "wbs" &&
-          activeMenu !== "materials" &&
-          activeMenu !== "labor" &&
-          activeMenu !== "subcontractors" &&
-          activeMenu !== "equipment" &&
-          activeMenu !== "acceptance" &&
-          activeMenu !== "invoices" &&
-          activeMenu !== "other-costs" &&
-          activeMenu !== "reports" &&
-          activeMenu !== "documents" &&
-          activeMenu !== "document-templates" &&
-          activeMenu !== "system-catalog" &&
-          activeMenu !== "system-settings" &&
-          activeMenu !== "daily-log" && (
+        {canAccessActiveMenu &&
+          activeMenuKey !== "dashboard" &&
+          activeMenuKey !== "contracts" &&
+          activeMenuKey !== "boq" &&
+          activeMenuKey !== "wbs" &&
+          activeMenuKey !== "materials" &&
+          activeMenuKey !== "labor" &&
+          activeMenuKey !== "subcontractors" &&
+          activeMenuKey !== "equipment" &&
+          activeMenuKey !== "acceptance" &&
+          activeMenuKey !== "invoices" &&
+          activeMenuKey !== "other-costs" &&
+          activeMenuKey !== "reports" &&
+          activeMenuKey !== "documents" &&
+          activeMenuKey !== "document-templates" &&
+          activeMenuKey !== "system-catalog" &&
+          activeMenuKey !== "system-settings" &&
+          activeMenuKey !== "daily-log" && (
           <PlaceholderPage title={activeMenuInfo.label} />
         )}
       </main>
@@ -7157,16 +7300,43 @@ function getDefaultAuthUser() {
   });
 }
 
+const DEFAULT_AUTH_USERS = [
+  getDefaultAuthUser(),
+  { id: "CAT-USR-TGD", maNguoiDung: "TGD", hoTen: "Tong Giam doc", email: "tgd@sonhoabinh.vn", matKhau: "123456", sdt: "", chucDanh: "Tong Giam doc", congTrinhPhanCong: "Tat ca", roles: ["TGD"], trangThai: "Hoat dong" },
+  { id: "CAT-USR-GDTC", maNguoiDung: "GDTC", hoTen: "Giam doc Thi cong", email: "gdtc@sonhoabinh.vn", matKhau: "123456", sdt: "", chucDanh: "Giam doc Thi cong", congTrinhPhanCong: "Tat ca", roles: ["GDTC"], trangThai: "Hoat dong" },
+  { id: "CAT-USR-PM", maNguoiDung: "PM", hoTen: "Giam doc Du an / PM", email: "pm@sonhoabinh.vn", matKhau: "123456", sdt: "", chucDanh: "Giam doc Du an / PM", congTrinhPhanCong: "Tat ca", roles: ["PM"], trangThai: "Hoat dong" },
+  { id: "CAT-USR-CHT", maNguoiDung: "CHT", hoTen: "Chi huy truong", email: "cht@sonhoabinh.vn", matKhau: "123456", sdt: "", chucDanh: "Chi huy truong", congTrinhPhanCong: "Cong trinh duoc giao", roles: ["CHT"], trangThai: "Hoat dong" },
+  { id: "CAT-USR-QS", maNguoiDung: "QS", hoTen: "QS", email: "qs@sonhoabinh.vn", matKhau: "123456", sdt: "", chucDanh: "QS", congTrinhPhanCong: "Cong trinh duoc giao", roles: ["QS"], trangThai: "Hoat dong" },
+  { id: "CAT-USR-QC", maNguoiDung: "QC", hoTen: "QC", email: "qc@sonhoabinh.vn", matKhau: "123456", sdt: "", chucDanh: "QC", congTrinhPhanCong: "Cong trinh duoc giao", roles: ["QC"], trangThai: "Hoat dong" },
+  { id: "CAT-USR-TKDA", maNguoiDung: "TKDA", hoTen: "Thu ky du an", email: "tkda@sonhoabinh.vn", matKhau: "123456", sdt: "", chucDanh: "Thu ky du an", congTrinhPhanCong: "Cong trinh duoc giao", roles: ["TKDA"], trangThai: "Hoat dong" },
+  { id: "CAT-USR-KTCT", maNguoiDung: "KTCT", hoTen: "Ke toan cong trinh", email: "ktct@sonhoabinh.vn", matKhau: "123456", sdt: "", chucDanh: "Ke toan cong trinh", congTrinhPhanCong: "Cong trinh duoc giao", roles: ["KTCT"], trangThai: "Hoat dong" },
+  { id: "CAT-USR-KHOCT", maNguoiDung: "KHOCT", hoTen: "Kho cong trinh", email: "khoct@sonhoabinh.vn", matKhau: "123456", sdt: "", chucDanh: "Kho cong trinh", congTrinhPhanCong: "Cong trinh duoc giao", roles: ["KHOCT"], trangThai: "Hoat dong" },
+].map(normalizeUserItem);
+
+function dedupeUsersByEmail(users) {
+  const seenEmails = new Set();
+
+  return (users || []).map(normalizeUserItem).filter((user) => {
+    const emailKey = normalizeText(user.email);
+    if (!emailKey) return true;
+    if (seenEmails.has(emailKey)) return false;
+    seenEmails.add(emailKey);
+    return true;
+  });
+}
+
 function ensureDefaultAdmin(users) {
-  const normalizedUsers = (users || []).map(normalizeUserItem);
-  const hasDefaultAdmin = normalizedUsers.some((user) => normalizeText(user.email) === "admin@sonhoabinh.vn");
-  return hasDefaultAdmin ? normalizedUsers : [getDefaultAuthUser(), ...normalizedUsers];
+  const uniqueUsers = dedupeUsersByEmail(users);
+  const existingEmails = new Set(uniqueUsers.map((user) => normalizeText(user.email)).filter(Boolean));
+  const missingDefaultUsers = DEFAULT_AUTH_USERS.filter((user) => !existingEmails.has(normalizeText(user.email)));
+
+  return [...uniqueUsers, ...missingDefaultUsers];
 }
 
 function readStoredUsers(fallbackUsers = []) {
   const savedUsers = readStorageArray(USERS_STORAGE_KEY);
   const seedUsers = savedUsers.length ? savedUsers : fallbackUsers;
-  const users = ensureDefaultAdmin(seedUsers.length ? seedUsers : [getDefaultAuthUser()]);
+  const users = ensureDefaultAdmin(seedUsers.length ? seedUsers : DEFAULT_AUTH_USERS);
   localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
   return users;
 }
@@ -7182,6 +7352,45 @@ function readCurrentUser() {
     localStorage.removeItem(CURRENT_USER_STORAGE_KEY);
     return null;
   }
+}
+
+function getCurrentUser() {
+  return readCurrentUser();
+}
+
+function normalizeMenuKey(menuKey) {
+  return MENU_KEY_ALIASES[menuKey] || menuKey;
+}
+
+function canUserViewMenu(user, menuKey) {
+  if (!user) return false;
+
+  const normalizedMenuKey = normalizeMenuKey(menuKey);
+  const roles = Array.isArray(user.roles) ? user.roles : user.roles ? [user.roles] : [];
+  const normalizedRoles = roles.map((role) => String(role).toUpperCase());
+
+  if (normalizedRoles.includes("ADMIN")) return true;
+  return normalizedRoles.some((role) => {
+    const allowed = ROLE_MENU_PERMISSIONS[role] || [];
+    return allowed.includes("*") || allowed.includes(normalizedMenuKey);
+  });
+}
+
+function canViewMenu(menuKey) {
+  try {
+    const currentUser = JSON.parse(localStorage.getItem(CURRENT_USER_STORAGE_KEY) || "null");
+    return canUserViewMenu(currentUser, menuKey);
+  } catch {
+    return false;
+  }
+}
+
+function getPreferredMenuKey(user = getCurrentUser(), preferredMenuKey = "dashboard") {
+  if (canUserViewMenu(user, preferredMenuKey)) return preferredMenuKey;
+
+  const dashboardMenu = mainMenus.find((menu) => menu.key === "dashboard" && canUserViewMenu(user, menu.key));
+  const firstPermittedMenu = mainMenus.find((menu) => canUserViewMenu(user, menu.key));
+  return dashboardMenu?.key || firstPermittedMenu?.key || preferredMenuKey;
 }
 
 function stripSensitiveUser(user) {
